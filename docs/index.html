@@ -5,8 +5,17 @@
     <meta charset="utf-8">
     
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.8/css/dataTables.dataTables.css" />
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <style>
+    body {
+        font-family: 'Roboto';font-size: 22px;
+    }
+</style>
 </head>
+
 <body>
+
+    <h1>Rice Rivers Center Publications</h1>
 
     <table id="myDataTable" class="display" style="width:100%">
         <thead>
@@ -55,11 +64,36 @@
 
                     // Initialize DataTables with the properly parsed data
                     $('#myDataTable').DataTable({
-                        destry: true,
                         data: sliceRows,       // The remaining rows (minus the header)
                         columns: tableHeadersFiltered, // The formatted headers
                         responsive: true,
-                        pageLength: 10
+                        pageLength: 10,
+                        autowidth: false,
+                        order: [[1, 'desc']], 
+
+                        // Define widths inside columnDefs
+                        columnDefs: [
+                            { targets: 0, width: "20%" }, // Authors
+                            { targets: 1, width: "10%" }, // Year
+                            { targets: 2, width: "40%" }, // Title (gets the most space)
+                            { targets: 3, width: "15%" }, // Journal
+                            { 
+                                targets: 4, // DOI Column
+                                width: "15%", 
+                                render: function (data, type, row) {
+                                    if (data && data.trim() !== "") {
+                                        // Determine the link destination
+                                        let url = (data.startsWith('http://') || data.startsWith('https://')) ? data : `https://doi.org/${data}`;
+                                        
+                                        // Instead of printing the massive URL as text, print a neat hyperlink anchor
+                                        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="font-weight:bold;">View DOI ↗</a>`;
+                                    }
+                                    return data;
+                                }
+                            }
+                        ]
+
+                        
                     });
                 },
                 error: function(xhr, status, error) {
