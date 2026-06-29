@@ -1,21 +1,72 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Rice Rivers Center Bibliography</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.8/css/dataTables.dataTables.css" />
+</head>
+<body>
 
-  </head>
-  <body>
+    <table id="myDataTable" class="display" style="width:100%">
+        <thead>
+            </thead>
+        <tbody>
+            </tbody>
+    </table>
 
-    <div id="CSVTable"></div>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>  
-    <script src="js/jquery.csvToTable.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <script src="https://cdn.datatables.net/2.3.8/js/dataTables.js"></script>
 
     <script>
-        $(function() {
-        $('#CSVTable').CSVToTable('files/rrc_publications_cleaned.csv');
+        $(document).ready(function() {
+            // Fetch the CSV file using jQuery
+            $.ajax({
+                url: 'files/rrc_publications_cleaned.csv',
+                dataType: 'text',
+                success: function(csvString) {
+                    
+                    // Use PapaParse to properly parse the string
+                    var parsed = Papa.parse(csvString, {
+                        skipEmptyLines: true
+                    });
+                    
+                    var allRows = parsed.data; // This is an array of arrays
+
+                    // Extract the first row to use as headers
+                    var rawHeaders = allRows.shift();
+
+                    var sliceRows = allRows.map(function(row) {
+                        return row.slice(2,7);
+                    });                     
+                    
+                    // Format headers into the object structure DataTables expects: [{title: "Col1"}, {title: "Col2"}]
+                    var tableHeaders = rawHeaders.map(function(headerText) {
+                        return { title: headerText };
+                    });
+
+                    var headersNames = ["Authors", "Year", "Title", "Journal", "DOI"]
+
+                    var tableHeadersFiltered = tableHeaders
+                        .filter((obj) => headersNames.includes(obj.title));
+
+                    // Initialize DataTables with the properly parsed data
+                    $('#myDataTable').DataTable({
+                        destry: true,
+                        data: sliceRows,       // The remaining rows (minus the header)
+                        columns: tableHeadersFiltered, // The formatted headers
+                        responsive: true,
+                        pageLength: 10
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Failed to fetch CSV file:", error);
+                }
+            });
         });
     </script>
-  </body>
+</body>
 </html>
