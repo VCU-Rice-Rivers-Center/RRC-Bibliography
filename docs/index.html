@@ -1,1 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Rice Rivers Center Bibliography</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="style.css">
 
+  </head>
+  <body>
+
+    <div id="CSVTable"></div>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>  
+    <script src="js/jquery.csvToTable.js"></script>
+
+    <script>
+        $(function() {
+        $('#CSVTable').CSVToTable('files/rrc_publications_cleaned.csv');
+        });
+    </script>
+  </body>
+</html>
