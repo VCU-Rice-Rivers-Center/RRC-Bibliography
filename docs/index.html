@@ -1,1 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rice Rivers Center Bibliography</title>
+    <meta charset="utf-8">
+    
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.8/css/dataTables.dataTables.css" />
+    <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+    <style>
+    body {
+        font-family: 'Roboto';font-size: 22px;
+    }
+</style>
+</head>
 
+<body>
+
+    <h1>Rice Rivers Center Publications</h1>
+
+    <table id="myDataTable" class="display" style="width:100%">
+        <thead>
+            </thead>
+        <tbody>
+            </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>  
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <script src="https://cdn.datatables.net/2.3.8/js/dataTables.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Fetch the CSV file using jQuery
+            $.ajax({
+                url: 'files/rrc_publications_cleaned.csv',
+                dataType: 'text',
+                success: function(csvString) {
+                    
+                    // Use PapaParse to properly parse the string
+                    var parsed = Papa.parse(csvString, {
+                        skipEmptyLines: true
+                    });
+                    
+                    var allRows = parsed.data; // This is an array of arrays
+
+                    // Extract the first row to use as headers
+                    var rawHeaders = allRows.shift();
+
+                    var sliceRows = allRows.map(function(row) {
+                        return row.slice(2,7);
+                    });                     
+                    
+                    // Format headers into the object structure DataTables expects: [{title: "Col1"}, {title: "Col2"}]
+                    var tableHeaders = rawHeaders.map(function(headerText) {
+                        return { title: headerText };
+                    });
+
+                    var headersNames = ["Authors", "Year", "Title", "Journal", "DOI"]
+
+                    var tableHeadersFiltered = tableHeaders
+                        .filter((obj) => headersNames.includes(obj.title));
+
+                    // Initialize DataTables with the properly parsed data
+                    $('#myDataTable').DataTable({
+                        data: sliceRows,       // The remaining rows (minus the header)
+                        columns: tableHeadersFiltered, // The formatted headers
+                        responsive: true,
+                        pageLength: 10,
+                        autowidth: false,
+                        order: [[1, 'desc']], 
+
+                        // Define widths inside columnDefs
+                        columnDefs: [
+                            { targets: 0, width: "20%" }, // Authors
+                            { targets: 1, width: "10%" }, // Year
+                            { targets: 2, width: "40%" }, // Title (gets the most space)
+                            { targets: 3, width: "15%" }, // Journal
+                            { 
+                                targets: 4, // DOI Column
+                                width: "15%", 
+                                render: function (data, type, row) {
+                                    if (data && data.trim() !== "") {
+                                        // Determine the link destination
+                                        let url = (data.startsWith('http://') || data.startsWith('https://')) ? data : `https://doi.org/${data}`;
+                                        
+                                        // Instead of printing the massive URL as text, print a neat hyperlink anchor
+                                        return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="font-weight:bold;">View DOI ↗</a>`;
+                                    }
+                                    return data;
+                                }
+                            }
+                        ]
+
+                        
+                    });
+                },
+                error: function(xhr, status, error) {
+                    console.error("Failed to fetch CSV file:", error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
