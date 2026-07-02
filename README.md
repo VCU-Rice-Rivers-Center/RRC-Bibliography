@@ -1,2 +1,2 @@
 # RRC-Bibliography
-Store RRC bibliography and create HTML page for hosting.
+Store RRC bibliography (publications and theses/dissertations) and create HTML page for hosting.
