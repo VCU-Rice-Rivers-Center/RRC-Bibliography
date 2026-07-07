@@ -8,7 +8,8 @@
     <link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
     <style>
     body {
-        font-family: 'Roboto';font-size: 22px;
+        font-family: 'Roboto';
+        font-size: 20px;
     }
 </style>
 </head>
@@ -32,7 +33,7 @@
         $(document).ready(function() {
             // Fetch the CSV file using jQuery
             $.ajax({
-                url: 'files/rrc_theses_and_dissertations_cleaned.csv',
+                url: 'files/rrc_theses.csv',
                 dataType: 'text',
                 success: function(csvString) {
                     
@@ -47,7 +48,7 @@
                     var rawHeaders = allRows.shift();
 
                     var sliceRows = allRows.map(function(row) {
-                        return row.slice(2,7);
+                        return row.slice(1,6);
                     });                     
                     
                     // Format headers into the object structure DataTables expects: [{title: "Col1"}, {title: "Col2"}]
